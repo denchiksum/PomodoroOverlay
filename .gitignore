@@ -17,3 +17,6 @@ build/
 # Environment variables
 .env
 .env.local
+
+# Logs
+/src-tauri/logs/
