@@ -12,7 +12,7 @@ A transparent, top-right anchored Pomodoro timer that stays on top of other wind
 - Local session logging (Markdown files in .\logs)
 - Volume control via settings window
 
-## Install (recommended)
+## Install
 Download release for Windows: https://github.com/den4iksum/PomodoroOverlay/releases
 
 ## Tech Stack
