@@ -166,11 +166,12 @@ export default App;
 /* INLINE STYLES */
 const styles = {
   container: {
-    width: "320px",
-    height: "240px",
+    width: "100vw",        // Fill the whole window
+    height: "100vh",       // Fill the whole window
     background: "rgba(20,20,20,0.55)",
     backdropFilter: "blur(12px)",
     border: "1px solid rgba(255,255,255,0.08)",
+    boxSizing: "border-box" as const, // Ensure border stays inside the 320x240 area
     overflow: "hidden",
     color: "white",
     padding: "12px",
