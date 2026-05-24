@@ -1,9 +1,9 @@
-import { invoke } from "@tauri-apps/api/core"; 
+import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { moveTopRight } from "./utils/window";
 import { playRandomSound } from "./utils/sound";
 import { openSettings } from "./utils/settingsWindow";
+import { initDefaultSounds } from "./utils/initSounds";
 import "./App.css";
 
 function App() {
@@ -15,6 +15,10 @@ function App() {
   const [status, setStatus] = useState<"idle" | "done">("idle");
 
   useEffect(() => {
+    initDefaultSounds();
+  }, []);
+
+  useEffect(() => {
     const initWindow = async () => {
       try {
         await new Promise((r) => setTimeout(r, 200));
@@ -23,7 +27,6 @@ function App() {
         console.error("Failed to move window:", err);
       }
     };
-
     initWindow();
   }, []);
 
@@ -35,36 +38,29 @@ function App() {
 
   useEffect(() => {
     if (!running) return;
-
     const id = setInterval(() => {
       setSeconds((s) => {
         if (s <= 1) {
           clearInterval(id);
           setRunning(false);
           setStatus("done");
-
           playRandomSound();
-
           return 0;
         }
-
         return s - 1;
       });
     }, 1000);
-
     return () => clearInterval(id);
   }, [running]);
 
   function formatTime(s: number) {
     const m = Math.floor(s / 60);
     const sec = s % 60;
-
     return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   }
 
   async function log(result: "completed" | "failed") {
     const plannedDurationSec = durationMinutes * 60;
-
     try {
       await invoke("log_session", {
         title,
@@ -75,7 +71,6 @@ function App() {
     } catch (e) {
       console.log("Logging not set up yet:", e);
     }
-
     reset();
   }
 
@@ -89,39 +84,31 @@ function App() {
     <main style={styles.container}>
       <h2 style={styles.timer}>{formatTime(seconds)}</h2>
 
-      {/* INPUT MODE */}
       {status === "idle" && (
         <div style={styles.card}>
-		  <button
-		    style={{
-			  position: "absolute",
-			  top: 8,
-			  right: 8,
-			  WebkitAppRegion: "no-drag",
-		    }}
-		    onClick={openSettings}
-		  >
-		    ⚙
-		  </button>
+          <button
+            style={styles.settingsBtn}
+            onClick={openSettings}
+          >
+            ⚙
+          </button>
+
           <input
             style={styles.input}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
           />
-
           <textarea
             style={styles.textarea}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
             placeholder="Description"
           />
-
           <div style={styles.durationRow}>
             <label style={{ fontSize: 14, color: "#fff" }}>
               Minutes:
             </label>
-
             <input
               type="number"
               min={1}
@@ -159,15 +146,12 @@ function App() {
         </div>
       )}
 
-      {/* DONE MODE */}
       {status === "done" && (
         <div style={styles.card}>
           <p>Session ended</p>
-
           <button style={styles.okBtn} onClick={() => log("completed")}>
             Completed
           </button>
-
           <button style={styles.failBtn} onClick={() => log("failed")}>
             Failed
           </button>
@@ -180,7 +164,7 @@ function App() {
 export default App;
 
 /* INLINE STYLES */
-const styles: Record<string, React.CSSProperties> = {
+const styles = {
   container: {
     width: "320px",
     height: "240px",
@@ -194,20 +178,32 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "sans-serif",
     display: "flex",
     flexDirection: "column",
-    WebkitAppRegion: "drag",
-  },
+    WebkitAppRegion: "drag" as const,
+  } as React.CSSProperties,
 
   timer: {
     textAlign: "center",
     fontSize: "28px",
     margin: "0 0 8px",
-  },
+  } as React.CSSProperties,
 
   card: {
     display: "flex",
     flexDirection: "column",
     gap: "6px",
-  },
+  } as React.CSSProperties,
+
+  settingsBtn: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    WebkitAppRegion: "no-drag" as const,
+    background: "transparent",
+    border: "none",
+    color: "white",
+    fontSize: "18px",
+    cursor: "pointer",
+  } as React.CSSProperties,
 
   input: {
     padding: "6px",
@@ -216,7 +212,7 @@ const styles: Record<string, React.CSSProperties> = {
     outline: "none",
     color: "#fff",
     background: "#0f0f0f98",
-  },
+  } as React.CSSProperties,
 
   textarea: {
     padding: "6px",
@@ -227,14 +223,14 @@ const styles: Record<string, React.CSSProperties> = {
     outline: "none",
     color: "#fff",
     background: "#0f0f0f98",
-  },
+  } as React.CSSProperties,
 
   durationRow: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     fontSize: "14px",
-  },
+  } as React.CSSProperties,
 
   startBtn: {
     padding: "8px",
@@ -242,7 +238,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     border: "none",
     borderRadius: "6px",
-  },
+  } as React.CSSProperties,
 
   stopBtn: {
     padding: "8px",
@@ -251,7 +247,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: "none",
     borderRadius: "6px",
     alignSelf: "center",
-  },
+  } as React.CSSProperties,
 
   okBtn: {
     padding: "8px",
@@ -259,7 +255,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     border: "none",
     borderRadius: "6px",
-  },
+  } as React.CSSProperties,
 
   failBtn: {
     padding: "8px",
@@ -267,5 +263,5 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     border: "none",
     borderRadius: "6px",
-  },
+  } as React.CSSProperties,
 };

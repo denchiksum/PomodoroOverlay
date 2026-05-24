@@ -29,7 +29,6 @@ export async function openSettings() {
       const main = getCurrentWindow();
 
       const mainPos = await main.outerPosition();
-      const mainSize = await main.outerSize();
 
       const settingsWidth = 300;
       const padding = 0;
@@ -37,12 +36,9 @@ export async function openSettings() {
       const x = mainPos.x - settingsWidth - padding;
       const y = mainPos.y;
 
-      await settingsWindow?.setPosition(
-        new LogicalPosition(x, y)
-      );
+      await settingsWindow?.setPosition(new LogicalPosition(x, y));
 
       await settingsWindow?.setFocus();
-
     } catch (err) {
       console.error("Dock positioning failed:", err);
     }

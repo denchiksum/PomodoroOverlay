@@ -1,25 +1,13 @@
-const sounds = import.meta.glob("../assets/sounds/*.{mp3,wav,ogg}", {
-  eager: true,
-  query: "?url",
-  import: "default",
-});
+import { invoke } from "@tauri-apps/api/core";
 
-const soundList = Object.values(sounds) as string[];
+export async function playRandomSound() {
+  try {
+    // Read volume from storage, default to 1.0 if not set
+    const savedVolume = localStorage.getItem("volume");
+    const volume = savedVolume ? parseFloat(savedVolume) : 1.0;
 
-export function playRandomSound() {
-  const volume = Number(localStorage.getItem("volume") ?? "1");
-
-  const sounds = import.meta.glob("../assets/sounds/*.{mp3,wav,ogg}", {
-    eager: true,
-    query: "?url",
-	import: "default",
-  });
-
-  const list = Object.values(sounds) as string[];
-  if (!list.length) return;
-
-  const audio = new Audio(list[Math.floor(Math.random() * list.length)]);
-  audio.volume = volume;
-
-  audio.play();
+    await invoke("play_random_sound", { volume });
+  } catch (err) {
+    console.error("Failed to play sound:", err);
+  }
 }
