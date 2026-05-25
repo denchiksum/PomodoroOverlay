@@ -1,55 +1,47 @@
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { getCurrentWindow, LogicalPosition } from "@tauri-apps/api/window";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const LABEL = "settings";
-
 let settingsWindow: WebviewWindow | null = null;
 
 export async function openSettings() {
-  console.log("Settings button clicked");
-
   if (settingsWindow) {
-    await settingsWindow.setFocus?.();
+    await settingsWindow.setFocus();
     return;
   }
 
+  const main = getCurrentWindow();
+  const mainPos = await main.outerPosition();
+  const scale = await main.scaleFactor();
+
+  const width = 300;
+  const height = 240;
+  const gap = 12;
+
+  // Calculate position
+  const x = (mainPos.x / scale) - width - gap;
+  const y = (mainPos.y / scale);
+
   settingsWindow = new WebviewWindow(LABEL, {
-    url: "#settings", // ✅ FIXED
+    url: "#settings",
     title: "Settings",
-    width: 300,
-    height: 240,
+    width: width,
+    height: height,
     resizable: false,
     transparent: true,
     decorations: false,
     alwaysOnTop: true,
+    visible: false, 
+    x: x,           
+    y: y,
   });
 
   settingsWindow.once("tauri://created", async () => {
-    try {
-      const main = getCurrentWindow();
-
-      const mainPos = await main.outerPosition();
-
-      const settingsWidth = 300;
-      const padding = 0;
-
-      const x = mainPos.x - settingsWidth - padding;
-      const y = mainPos.y;
-
-      await settingsWindow?.setPosition(new LogicalPosition(x, y));
-
-      await settingsWindow?.setFocus();
-    } catch (err) {
-      console.error("Dock positioning failed:", err);
-    }
+    await settingsWindow?.show();
+    await settingsWindow?.setFocus();
   });
 
   settingsWindow.once("tauri://destroyed", () => {
-    settingsWindow = null;
-  });
-
-  settingsWindow.once("tauri://error", (e) => {
-    console.error("Settings window error:", e);
     settingsWindow = null;
   });
 }
