@@ -1,6 +1,8 @@
 # Pomodoro Overlay
 
 A transparent, top-right anchored Pomodoro timer that stays on top of other windows
+
+<img width="471" height="458" alt="PomodoroOverlayIcon" src="https://github.com/user-attachments/assets/aa7c43ca-3a30-42f6-a3b6-88f6186a88cd" />
 ![Screenshot 1](./screenshots/1.png)
 ![Screenshot 2](./screenshots/2.png)
 ![Screenshot 3](./screenshots/3.png)
